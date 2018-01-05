@@ -16,10 +16,12 @@ const std::vector<const char*> validationLayers = {
     "VK_LAYER_LUNARG_standard_validation"
 };
 
+
+
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
 #else
-const bool enableValidationLayers = false;
+const bool enableValidationLayers = true;
 #endif
 
 VkResult CreateDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback) {
@@ -52,6 +54,7 @@ private:
 
     VkInstance instance;
     VkDebugReportCallbackEXT callback;
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 
     void initWindow() {
         glfwInit();
@@ -65,6 +68,34 @@ private:
     void initVulkan() {
         createInstance();
         setupDebugCallback();
+        pickPhysicalDevice();
+    }
+    void pickPhysicalDevice() {
+        uint32_t deviceCount = 0;
+        vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+        if (deviceCount == 0) {
+            throw std::runtime_error("failed to find GPUs with Vulkan support!");
+        }
+
+        std::vector<VkPhysicalDevice> devices(deviceCount);
+        vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+
+        // TODO: ranges::max(devices, HelloTriangleApplication::DeviceScore);
+        auto idx = ranges::find_if(devices, HelloTriangleApplication::isDeviceSuitable);
+
+        if(idx == devices.end()){
+            throw std::runtime_error("No GPUs with suitable support!");
+        }
+
+    }
+
+    static bool isDeviceSuitable(VkPhysicalDevice device) {
+        VkPhysicalDeviceProperties deviceProperties;
+        VkPhysicalDeviceFeatures deviceFeatures;
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+        vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+        return deviceProperties.deviceType == deviceFeatures.geometryShader;
     }
 
     void mainLoop() {
