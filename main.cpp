@@ -1,12 +1,24 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include <range/v3/algorithm.hpp>
+#include <range/v3/core.hpp>
 
+#include <algorithm>
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 #include <vector>
 const int WIDTH = 800;
 const int HEIGHT = 600;
+const std::vector<const char *> validationLayers = {
+    "VK_LAYER_LUNARG_standard_validation"};
+#ifdef NDEBUG
+const bool enableValidationLayers = false;
+#else
+const bool enableValidationLayers = false;
+#endif
 
 class HelloTriangleApplication {
 public:
@@ -26,6 +38,9 @@ private:
   }
   void initVulkan() { createInstance(); }
   void createInstance() {
+    if (enableValidationLayers && !checkValidationLayerSupport()) {
+      throw std::runtime_error("Validation layers requested but not available");
+    }
     VkApplicationInfo appInfo = {};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "Hello Triangle";
@@ -43,8 +58,13 @@ private:
     createInfo.pApplicationInfo = &appInfo;
     createInfo.enabledExtensionCount = glfwExtensionCount;
     createInfo.ppEnabledExtensionNames = glfwExtensions;
-    createInfo.enabledLayerCount = 0;
-
+    if (enableValidationLayers) {
+      createInfo.enabledLayerCount =
+          static_cast<uint32_t>(validationLayers.size());
+      createInfo.ppEnabledLayerNames = validationLayers.data();
+    } else {
+      createInfo.enabledLayerCount = 0;
+    }
     VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
     if (result != VK_SUCCESS) {
       throw std::runtime_error("failed to create instance!");
@@ -59,6 +79,31 @@ private:
     for (const auto &extension : extensions) {
       std::cout << "\t" << extension.extensionName << std::endl;
     }
+  }
+
+  bool checkValidationLayerSupport() {
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+    std::cout << "Layers available" << std::endl;
+    for (const auto &layer : availableLayers) {
+      std::cout << "\t" << layer.layerName << std::endl;
+    }
+
+    for (const char *layerName : validationLayers) {
+      bool layerFound = false;
+      auto byLayerName = [=](const auto &layer) {
+        return strcmp(layer.layerName, layerName) == 0;
+      };
+      auto idx = ranges::find_if(availableLayers, byLayerName);
+      if (idx == availableLayers.end()) {
+        std::cout << "Could not find layer " << layerName << std::endl;
+        return false;
+      }
+    }
+    return true;
   }
   void mainLoop() {
     while (!glfwWindowShouldClose(window)) {
