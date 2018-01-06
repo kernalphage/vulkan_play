@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4)
 project(vulkan_play)
-set(VULKAN_SDK_PATH "/home/matt/projects/VulkanSDK/1.0.65.0/x86_64")
+set(VULKAN_SDK_PATH $ENV{VULKAN_SDK_PATH})
 set(Vulkan_INCLUDE_DIR "${VULKAN_SDK_PATH}/include")
 set(Vulkan_LIB_DIR "${VULKAN_SDK_PATH}/lib")
 
