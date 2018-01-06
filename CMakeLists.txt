@@ -13,6 +13,7 @@ pkg_search_module(GLFW REQUIRED glfw3)
 include_directories(${GLFW_INCLUDE_DIRS})
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS "-g")
 set(SOURCE_FILES main.cpp)
 
 add_executable(vulkan_play ${SOURCE_FILES})
