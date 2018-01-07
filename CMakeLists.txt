@@ -1,24 +1,35 @@
 cmake_minimum_required(VERSION 3.4)
 project(vulkan_play)
-set(VULKAN_SDK_PATH $ENV{VULKAN_SDK_PATH})
+set(VULKAN_SDK_PATH $ENV{VULKAN_SDK})
 set(Vulkan_INCLUDE_DIR "${VULKAN_SDK_PATH}/include")
 set(Vulkan_LIB_DIR "${VULKAN_SDK_PATH}/lib")
-
-include_directories(${Vulkan_INCLUDE_DIR})
-set(LIBRARIES "vulkan")
-link_directories(${Vulkan_LIB_DIR})
-
-find_package(PkgConfig REQUIRED)
-pkg_search_module(GLFW REQUIRED glfw3)
-include_directories(${GLFW_INCLUDE_DIRS})
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "-g")
 set(SOURCE_FILES main.cpp)
 
 add_executable(vulkan_play ${SOURCE_FILES})
-target_link_libraries(vulkan_play glfw ${GLFW_LIBRARIES})
-target_link_libraries(vulkan_play ${LIBRARIES})
+
+include_directories(${Vulkan_INCLUDE_DIR})
+
+if(WIN32)
+    set(GLFW_PATH $ENV{GLFW_SDK})
+    include_directories("${GLFW_PATH}/include")
+    include_directories($ENV{RANGES_INCLUDE})
+
+    target_link_libraries(vulkan_play "${GLFW_PATH}/lib-vc2015/glfw3.lib")
+    target_link_libraries(vulkan_play "${VULKAN_SDK_PATH}/Lib32/vulkan-1.lib")
+
+ELSE()
+    find_package(PkgConfig REQUIRED)
+    pkg_search_module(GLFW REQUIRED glfw3)
+    include_directories(${GLFW_INCLUDE_DIRS})
+    target_link_libraries(vulkan_play glfw ${GLFW_LIBRARIES})
+    link_directories(${Vulkan_LIB_DIR})
+    set(LIBRARIES "vulkan")
+    target_link_libraries(vulkan_play ${LIBRARIES})
+ENDIF()
+
 
 # shaders! https://gist.github.com/vlsh/a0d191701cb48f157b05be7f74d79396
 

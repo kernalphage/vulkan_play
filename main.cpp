@@ -1,8 +1,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-#include <range/v3/algorithm.hpp>
-#include <range/v3/core.hpp>
+//#include <range/v3/algorithm.hpp>
+//#include <range/v3/core.hpp>
 
 #include <cstring>
 #include <fstream>
@@ -10,6 +10,7 @@
 #include <set>
 #include <stdexcept>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 const int WIDTH = 800;
@@ -547,8 +548,8 @@ private:
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
     // TODO: ranges::max(devices, HelloTriangleApplication::DeviceScore);
-    auto idx = ranges::find_if(
-        devices, [this](auto dev) { return this->isDeviceSuitable(dev); });
+    auto idx = std::find_if(
+        devices.begin(), devices.end(), [this](auto dev) { return this->isDeviceSuitable(dev); });
 
     if (idx == devices.end()) {
       throw std::runtime_error("No GPUs with suitable support!");
@@ -774,7 +775,7 @@ private:
     vkDestroySwapchainKHR(device, swapChain, nullptr);
     vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyDevice(device, nullptr);
-    DestroyDebugReportCallbackEXT(instance, callback, nullptr);
+    //DestroyDebugReportCallbackEXT(instance, callback, nullptr);
     vkDestroyInstance(instance, nullptr);
 
     glfwDestroyWindow(window);
@@ -870,7 +871,7 @@ private:
       auto byLayerName = [=](const auto &layer) {
         return strcmp(layer.layerName, layerName) == 0;
       };
-      auto idx = ranges::find_if(availableLayers, byLayerName);
+      auto idx = std::find_if(availableLayers.begin(), availableLayers.end(), byLayerName);
       if (idx == availableLayers.end()) {
         std::cout << "Could not find layer " << layerName << std::endl;
         return false;
@@ -886,7 +887,7 @@ private:
     // clang-format off
         char *message = (char *) malloc(strlen(pMsg) + 100);
         int validation_error =0;
-        assert(message);
+        //assert(message);
 
         if (msgFlags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT) {
             sprintf(message, "INFORMATION: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
@@ -908,6 +909,8 @@ private:
             validation_error = 1;
         }
         free(message);
+
+		return VK_FALSE;
     }
 
 
@@ -931,6 +934,5 @@ int main() {
     std::cerr << e.what() << std::endl;
     return EXIT_FAILURE;
   }
-
   return EXIT_SUCCESS;
 }

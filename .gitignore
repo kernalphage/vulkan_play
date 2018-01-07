@@ -1,4 +1,5 @@
 .idea
+bin
 vulkan_play
 CMakeFiles
 CMakeCache.txt
