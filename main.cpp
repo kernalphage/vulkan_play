@@ -908,6 +908,7 @@ private:
             sprintf(message, "INFORMATION: [%s] Code %d : %s", pLayerPrefix, msgCode, pMsg);
             validation_error = 1;
         }
+	cout<<message;
         free(message);
 
 		return VK_FALSE;
