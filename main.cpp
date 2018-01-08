@@ -1,5 +1,6 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include "graphic_structs.hpp"
 
 //#include <range/v3/algorithm.hpp>
 //#include <range/v3/core.hpp>
@@ -21,16 +22,6 @@ const std::vector<const char *> validationLayers = {
 const std::vector<const char *> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-struct QueueFamilyIndices {
-  int graphicsFamily = -1;
-  int presentFamily = -1;
-  bool isComplete() { return graphicsFamily >= 0 && presentFamily >= 0; }
-};
-struct SwapChainSupportDetails {
-  VkSurfaceCapabilitiesKHR capabilities;
-  std::vector<VkSurfaceFormatKHR> formats;
-  std::vector<VkPresentModeKHR> presentModes;
-};
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
 #else
@@ -107,7 +98,11 @@ private:
   std::vector<VkCommandBuffer> commandBuffers;
   VkSemaphore imageAvailableSemaphore;
   VkSemaphore renderFinishedSemaphore;
-
+    const std::vector<Vertex> vertices = {
+            {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+    };
   void initWindow() {
     glfwInit();
 
