@@ -4,13 +4,13 @@
 //#include <range/v3/algorithm.hpp>
 //#include <range/v3/core.hpp>
 
+#include <algorithm>
 #include <cstring>
 #include <fstream>
 #include <iostream>
 #include <set>
 #include <stdexcept>
 #include <vector>
-#include <algorithm>
 using namespace std;
 
 const int WIDTH = 800;
@@ -548,8 +548,9 @@ private:
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
     // TODO: ranges::max(devices, HelloTriangleApplication::DeviceScore);
-    auto idx = std::find_if(
-        devices.begin(), devices.end(), [this](auto dev) { return this->isDeviceSuitable(dev); });
+    auto idx = std::find_if(devices.begin(), devices.end(), [this](auto dev) {
+      return this->isDeviceSuitable(dev);
+    });
 
     if (idx == devices.end()) {
       throw std::runtime_error("No GPUs with suitable support!");
@@ -709,12 +710,18 @@ private:
 
   void mainLoop() {
     while (!glfwWindowShouldClose(window)) {
+
       glfwPollEvents();
-      // drawFrame();
+      updateAppState();
+      drawFrame();
     }
   }
 
+  void updateAppState() {}
   void drawFrame() {
+
+    vkQueueWaitIdle(presentQueue);
+
     uint32_t imageIndex;
     vkAcquireNextImageKHR(device, swapChain,
                           std::numeric_limits<uint64_t>::max(),
@@ -755,8 +762,6 @@ private:
     presentInfo.pImageIndices = &imageIndex;
 
     vkQueuePresentKHR(presentQueue, &presentInfo);
-
-    vkQueueWaitIdle(presentQueue);
   }
   void cleanup() {
     vkDestroySemaphore(device, renderFinishedSemaphore, nullptr);
@@ -775,7 +780,7 @@ private:
     vkDestroySwapchainKHR(device, swapChain, nullptr);
     vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyDevice(device, nullptr);
-    //DestroyDebugReportCallbackEXT(instance, callback, nullptr);
+    // DestroyDebugReportCallbackEXT(instance, callback, nullptr);
     vkDestroyInstance(instance, nullptr);
 
     glfwDestroyWindow(window);
@@ -871,7 +876,8 @@ private:
       auto byLayerName = [=](const auto &layer) {
         return strcmp(layer.layerName, layerName) == 0;
       };
-      auto idx = std::find_if(availableLayers.begin(), availableLayers.end(), byLayerName);
+      auto idx = std::find_if(availableLayers.begin(), availableLayers.end(),
+                              byLayerName);
       if (idx == availableLayers.end()) {
         std::cout << "Could not find layer " << layerName << std::endl;
         return false;
