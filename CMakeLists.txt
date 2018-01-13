@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.4)
 project(vulkan_play)
-set(VULKAN_SDK_PATH $ENV{VULKAN_SDK})
+set(VULKAN_SDK_PATH $ENV{VULKAN_SDK_PATH})
 set(Vulkan_INCLUDE_DIR "${VULKAN_SDK_PATH}/include")
 set(Vulkan_LIB_DIR "${VULKAN_SDK_PATH}/lib")
+message("VUlkan sdk ${VULKAN_SDK_PATH}")
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "-g")
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp graphic_structs.hpp)
 
 add_executable(vulkan_play ${SOURCE_FILES})
 
