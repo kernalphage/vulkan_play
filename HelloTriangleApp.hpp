@@ -24,6 +24,7 @@ private:
   void initVulkan();
 
   void createVertexBuffer();
+  void createIndexBuffer();
 
   uint32_t findMemoryType(uint32_t typeFilter,
                           VkMemoryPropertyFlags properties);
@@ -98,15 +99,21 @@ private:
   std::vector<VkCommandBuffer> commandBuffers;
   VkSemaphore imageAvailableSemaphore;
   VkSemaphore renderFinishedSemaphore;
+
+  // TODO: Driver developers recommend that you also store multiple buffers,
+  // like the vertex and index buffer, into a single VkBuffer and use offsets in
+  // commands like vkCmdBindVertexBuffers
+  // https://developer.nvidia.com/vulkan-memory-management
   VkBuffer vertexBuffer;
   VkDeviceMemory vertexBufferMemory;
+  VkBuffer indexBuffer;
+  VkDeviceMemory indexBufferMemory;
+  const std::vector<Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+                                        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+                                        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+                                        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
 
-  const std::vector<Vertex> vertices = {{{-0.75f, -0.75f}, {1.0f, 1.0f, 1.0f}},
-                                        {{0.75f, 0.75f}, {0.0f, 1.0f, 0.0f}},
-                                        {{-0.75f, 0.75f}, {0.0f, 0.0f, 1.0f}},
-                                        {{0.25f, -0.25f}, {1.0f, 0.0f, 0.0f}},
-                                        {{0.25f, 0.25f}, {0.0f, 1.0f, 0.0f}},
-                                        {{-0.25f, 0.25f}, {0.0f, 0.0f, 1.0f}}};
+  const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 };
 
 #endif // VULKAN_PLAY_HELLOTRIANGLEAPP_HPP
