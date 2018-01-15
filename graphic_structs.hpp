@@ -14,6 +14,12 @@ struct QueueFamilyIndices {
   bool isComplete() { return graphicsFamily >= 0 && presentFamily >= 0; }
 };
 
+struct BufferMemory{
+  VkBuffer buffer;
+  VkDeviceMemory bufferMemory;
+};
+
+
 struct Vertex {
   glm::vec2 pos;
   glm::vec3 color;
