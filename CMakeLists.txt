@@ -7,7 +7,7 @@ message("VUlkan sdk ${VULKAN_SDK_PATH}")
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "-g")
-set(SOURCE_FILES main.cpp graphic_structs.hpp)
+set(SOURCE_FILES main.cpp graphic_structs.hpp HelloTriangleApp.cpp HelloTriangleApp.hpp)
 
 add_executable(vulkan_play ${SOURCE_FILES})
 
@@ -34,7 +34,7 @@ ENDIF()
 
 # shaders! https://gist.github.com/vlsh/a0d191701cb48f157b05be7f74d79396
 
-set(GLSL_VALIDATOR "${VULKAN_SDK_PATH}/bin/glslangValidator")
+set(GLSL_VALIDATOR "glslangValidator")
 file(GLOB_RECURSE GLSL_SOURCE_FILES
         "shaders/*.frag"
         "shaders/*.vert"
