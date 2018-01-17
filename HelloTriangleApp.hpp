@@ -25,7 +25,7 @@ private:
 
   void createVertexBuffer();
   void createIndexBuffer();
-
+  void createUniformBuffer();
   uint32_t findMemoryType(uint32_t typeFilter,
                           VkMemoryPropertyFlags properties);
   void recreateSwapChain();
@@ -34,6 +34,8 @@ private:
   void createCommandPool();
   void createFramebuffers();
   void createRenderPass();
+  void createDescriptorSetLayout();
+  void createDescriptorSet();
   void createGraphicsPipeline();
 
   VkShaderModule createShaderModule(const std::vector<char> &code);
@@ -56,6 +58,10 @@ private:
   VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
   void mainLoop();
   void updateAppState();
+  void updateUniformBuffer();
+
+  void createDescriptorPool();
+
   void drawFrame();
   void cleanupSwapChain();
   void cleanup();
@@ -91,15 +97,20 @@ private:
   VkFormat swapChainImageFormat;
   VkExtent2D swapChainExtent;
   VkRenderPass renderPass;
+  VkDescriptorSetLayout descriptorSetLayout;
   VkPipelineLayout pipelineLayout;
   VkPipeline graphicsPipeline;
   VkSurfaceKHR surface;
   VkSwapchainKHR swapChain;
   VkCommandPool commandPool;
+  VkDescriptorPool descriptorPool;
+  VkDescriptorSet descriptorSet;
+
   std::vector<VkCommandBuffer> commandBuffers;
   VkSemaphore imageAvailableSemaphore;
   VkSemaphore renderFinishedSemaphore;
 
+  // TODO: Group buffer/buffermemory in to a single object
   // TODO: Driver developers recommend that you also store multiple buffers,
   // like the vertex and index buffer, into a single VkBuffer and use offsets in
   // commands like vkCmdBindVertexBuffers
@@ -108,6 +119,8 @@ private:
   VkDeviceMemory vertexBufferMemory;
   VkBuffer indexBuffer;
   VkDeviceMemory indexBufferMemory;
+  VkBuffer uniformBuffer;
+  VkDeviceMemory uniformBufferMemory;
   const std::vector<Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
                                         {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
                                         {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
