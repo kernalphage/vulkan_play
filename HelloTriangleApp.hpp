@@ -121,12 +121,26 @@ private:
   VkDeviceMemory indexBufferMemory;
   VkBuffer uniformBuffer;
   VkDeviceMemory uniformBufferMemory;
+
+  VkBuffer stagingBuffer;
+  VkDeviceMemory stagingBufferMemory;
+  VkImage textureImage;
+  VkDeviceMemory textureImageMemory;
+
   const std::vector<Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
                                         {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
                                         {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
                                         {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
 
   const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
+
+  void createTextureImage();
+  void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+
+  VkCommandBuffer beginSingleTimeCommands();
+  void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+  void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+  void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 };
 
 #endif // VULKAN_PLAY_HELLOTRIANGLEAPP_HPP

@@ -12,7 +12,7 @@ set(SOURCE_FILES main.cpp graphic_structs.hpp HelloTriangleApp.cpp HelloTriangle
 add_executable(vulkan_play ${SOURCE_FILES})
 
 include_directories(${Vulkan_INCLUDE_DIR})
-
+include_directories("../../git/stb")
 if(WIN32)
     set(GLFW_PATH $ENV{GLFW_SDK})
     include_directories("${GLFW_PATH}/include")
