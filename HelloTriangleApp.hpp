@@ -121,9 +121,9 @@ private:
   VkDeviceMemory indexBufferMemory;
   VkBuffer uniformBuffer;
   VkDeviceMemory uniformBufferMemory;
+  VkImageView textureImageView;
+  VkSampler textureSampler;
 
-  VkBuffer stagingBuffer;
-  VkDeviceMemory stagingBufferMemory;
   VkImage textureImage;
   VkDeviceMemory textureImageMemory;
 
@@ -135,12 +135,23 @@ private:
   const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 
   void createTextureImage();
-  void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+  void createImage(uint32_t width, uint32_t height, VkFormat format,
+                   VkImageTiling tiling, VkImageUsageFlags usage,
+                   VkMemoryPropertyFlags properties, VkImage &image,
+                   VkDeviceMemory &imageMemory);
 
   VkCommandBuffer beginSingleTimeCommands();
   void endSingleTimeCommands(VkCommandBuffer commandBuffer);
-  void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-  void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+  void transitionImageLayout(VkImage image, VkFormat format,
+                             VkImageLayout oldLayout, VkImageLayout newLayout);
+  void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width,
+                         uint32_t height);
+
+  void createTextureImageView();
+
+  VkImageView createImageView(VkImage image, VkFormat format);
+
+  void createTextureImageSampler();
 };
 
 #endif // VULKAN_PLAY_HELLOTRIANGLEAPP_HPP
