@@ -14,6 +14,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
 
 using namespace std;
 
@@ -115,6 +117,7 @@ void HelloTriangleApp::initVulkan() {
   createTextureImage();
   createTextureImageView();
   createTextureImageSampler();
+  loadModel();
   createVertexBuffer();
   createIndexBuffer();
 
@@ -178,6 +181,7 @@ void HelloTriangleApp::recreateSwapChain() {
   createImageViews();
   createRenderPass();
   createGraphicsPipeline();
+  createDepthResources();
   createFramebuffers();
   createCommandBuffers();
 }
@@ -238,7 +242,7 @@ void HelloTriangleApp::createCommandBuffers() {
     // meshes
     vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
     vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0,
-                         VK_INDEX_TYPE_UINT16);
+                         VK_INDEX_TYPE_UINT32);
     // uniforms
     vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
                             pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
@@ -810,7 +814,15 @@ void HelloTriangleApp::mainLoop() {
   vkDeviceWaitIdle(device);
 }
 
-void HelloTriangleApp::updateAppState() {}
+void HelloTriangleApp::updateAppState() {
+  static auto startTime = std::chrono::high_resolution_clock::now();
+
+  auto currentTime = std::chrono::high_resolution_clock::now();
+  m_delta_time = std::chrono::duration<float, std::chrono::seconds::period>(
+                     currentTime - startTime)
+                     .count();
+  m_total_time += m_delta_time;
+}
 void HelloTriangleApp::drawFrame() {
 
   vkQueueWaitIdle(presentQueue);
@@ -871,6 +883,11 @@ void HelloTriangleApp::drawFrame() {
 }
 
 void HelloTriangleApp::cleanupSwapChain() {
+
+  vkDestroyImageView(device, depthImageView, nullptr);
+  vkDestroyImage(device, depthImage, nullptr);
+  vkFreeMemory(device, depthImageMemory, nullptr);
+
   for (auto framebuffer : swapChainFramebuffers) {
     vkDestroyFramebuffer(device, framebuffer, nullptr);
   }
@@ -1151,13 +1168,9 @@ void HelloTriangleApp::createUniformBuffer() {
 }
 
 void HelloTriangleApp::updateUniformBuffer() {
-  static auto startTime = std::chrono::high_resolution_clock::now();
-
-  auto currentTime = std::chrono::high_resolution_clock::now();
-  float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
   UniformBufferObject ubo = {};
-  ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+  ubo.model = glm::rotate(glm::mat4(1.0f), m_delta_time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
   ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
   ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float) swapChainExtent.height, 0.1f, 10.0f);
 
@@ -1234,7 +1247,7 @@ void HelloTriangleApp::createDescriptorSet() {
 
 void HelloTriangleApp::createTextureImage() {
   int texWidth, texHeight, texChannels;
-  stbi_uc* pixels = stbi_load("textures/dice.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+  stbi_uc* pixels = stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
   VkDeviceSize imageSize = texWidth * texHeight * 4;
 
   if (!pixels) {
@@ -1521,4 +1534,35 @@ VkFormat HelloTriangleApp::findDepthFormat() {
       VK_IMAGE_TILING_OPTIMAL,
       VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
   );
+}
+
+void HelloTriangleApp::loadModel() {
+  tinyobj::attrib_t attrib;
+  std::vector<tinyobj::shape_t> shapes;
+  std::vector<tinyobj::material_t> materials;
+  std::string err;
+
+  if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, MODEL_PATH.c_str())) {
+    throw std::runtime_error(err);
+  }
+  cout<<err<<endl;
+  for (const auto& shape : shapes) {
+    for (const auto& index : shape.mesh.indices) {
+      Vertex vertex = {};
+      vertex.pos = {
+          attrib.vertices[3 * index.vertex_index + 0],
+          attrib.vertices[3 * index.vertex_index + 1],
+          attrib.vertices[3 * index.vertex_index + 2]
+      };
+
+      vertex.texCoord = {
+          attrib.texcoords[2 * index.texcoord_index + 0],
+          attrib.texcoords[2 * index.texcoord_index + 1]
+      };
+
+      vertex.color = {1.0f, 1.0f, 1.0f};
+      vertices.push_back(vertex);
+      indices.push_back(indices.size());
+    }
+  }
 }

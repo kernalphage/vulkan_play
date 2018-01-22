@@ -6,8 +6,12 @@ set(Vulkan_LIB_DIR "${VULKAN_SDK_PATH}/lib")
 message("VUlkan sdk ${VULKAN_SDK_PATH}")
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "-g")
-set(SOURCE_FILES main.cpp graphic_structs.hpp HelloTriangleApp.cpp HelloTriangleApp.hpp)
+set(CMAKE_CXX_FLAGS "-g -O3" )
+set(SOURCE_FILES main.cpp
+        graphic_structs.hpp
+        HelloTriangleApp.cpp
+        HelloTriangleApp.hpp
+        tiny_obj_loader.h)
 
 add_executable(vulkan_play ${SOURCE_FILES})
 
