@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include <unordered_map>
 
 #include "graphic_structs.hpp"
 
@@ -138,6 +139,7 @@ private:
 
   const std::string MODEL_PATH = "models/chalet.obj";
   const std::string TEXTURE_PATH = "textures/chalet.jpg";
+  std::unordered_map<Vertex, uint32_t> uniqueVertices;
   std::vector<Vertex> vertices;
   std::vector<uint32_t> indices;
 
