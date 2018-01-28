@@ -3,5 +3,5 @@ Playing off of vulkan-tutorial
 
 
 https://vulkan-tutorial.com 
+run through the development environment setup and you should be set. 
 
-Currently this doesn't output debug information on Ubuntu because I'm dumb, and doesn't work on Windows because windows is dumb. 
